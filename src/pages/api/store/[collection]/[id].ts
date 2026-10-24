@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { isAdmin } from '@/lib/admin';
 import { COLLECTIONS, deleteDoc, setDoc, validId } from '@/lib/store';
 
 const VERDICTS = new Set(['ok', 'cond', 'warn', 'no']);
@@ -45,9 +46,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'PUT') {
       const data = clean(req.body);
       if (!data) return res.status(400).json({ detail: '브랜드, 제품명, 판정, 회신 요지를 확인해주세요.' });
-      return res.status(200).json({ data: await setDoc(collection, id, data) });
+      // 새 회신 추가는 누구나, 이미 있는 카드를 덮어쓰는 건 관리자만
+      const saved = await setDoc(collection, id, data, !isAdmin(req));
+      if (!saved) return res.status(403).json({ detail: '이미 있는 카드는 관리자만 고칠 수 있어요.' });
+      return res.status(200).json({ data: saved });
     }
     if (req.method === 'DELETE') {
+      if (!isAdmin(req)) return res.status(403).json({ detail: '삭제는 관리자만 할 수 있어요.' });
       await deleteDoc(collection, id);
       return res.status(200).json({ ok: true });
     }

@@ -75,9 +75,11 @@ export async function listDocs(collection: string): Promise<Doc[]> {
     .map((id) => ({ id, data: all[id] }));
 }
 
-export function setDoc(collection: string, id: string, data: Record<string, unknown>) {
+// createOnly 면 이미 있는 id 는 덮어쓰지 않고 null 을 돌려준다(관리자가 아닌 사람의 저장은 새 카드만)
+export function setDoc(collection: string, id: string, data: Record<string, unknown>, createOnly = false) {
   return serial(async () => {
     const all = await readAll(collection);
+    if (createOnly && id in all) return null;
     all[id] = data;
     await writeAll(collection, all);
     return data;

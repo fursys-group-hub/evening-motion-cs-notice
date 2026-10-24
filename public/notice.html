@@ -129,6 +129,11 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
 .added{font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:1px 7px}
 .del{border:0;background:none;color:var(--text3);font:inherit;font-size:12px;cursor:pointer;padding:0;text-decoration:underline;margin-right:auto}
 .del.confirm{color:var(--red);font-weight:700}
+.adminbar{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--text2)}
+.adminlink{border:0;background:none;color:var(--text3);font:inherit;font-size:13px;cursor:pointer;padding:0;text-decoration:underline}
+.adminlink:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.adminform{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.adminform input{font:inherit;font-size:14px;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px;min-width:0}
 .remote-row{display:grid;grid-template-columns:280px 1fr;gap:12px;align-items:start}
 .remote{margin:0;background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;justify-content:center}
 .remote img{width:100%;max-width:256px;height:auto;display:block}
@@ -384,6 +389,17 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
   </section>
 </div>
 
+<footer class="adminbar" id="adminBar" hidden>
+  <button type="button" class="adminlink" id="adminOpen">관리자</button>
+  <form class="adminform" id="adminForm" hidden>
+    <label for="adminKey">관리자 비밀번호</label>
+    <input id="adminKey" type="password" autocomplete="current-password" maxlength="200">
+    <button type="submit" class="primary">확인</button>
+    <span id="adminMsg" class="fmsg" role="status"></span>
+  </form>
+  <span id="adminOn" hidden>관리자 모드 · 카드 삭제 가능 <button type="button" class="adminlink" id="adminOff">나가기</button></span>
+</footer>
+
 </div>
 
 <script>
@@ -430,6 +446,7 @@ const thumbSrc = k => (window.THUMBS && window.THUMBS[k]) || `/static/thumbs/${k
 const LABEL = {ok:"가능", cond:"조건부", warn:"권장 안 함", no:"불가"};
 const ORDER = ["ok","cond","warn","no"];
 let filter = "all";
+let adminKey = "";   // 관리자 비밀번호(맞을 때만 채워짐) — 있으면 카드에 삭제 버튼이 보인다
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
@@ -470,7 +487,7 @@ const Store = {
   },
   async remove(id){
     if (this.mode === "db") return this.db.collection(COLL).doc(id).delete();
-    const r = await fetch(`/api/store/${COLL}/${encodeURIComponent(id)}`, {method: "DELETE"});
+    const r = await fetch(`/api/store/${COLL}/${encodeURIComponent(id)}`, {method: "DELETE", headers: {"X-Admin-Key": adminKey}});
     if (!r.ok) throw new Error("delete failed");
     this.refresh();
   },
@@ -499,7 +516,7 @@ function render(){
       <div class="reply">${esc(f.reply)}</div>
       ${f.guide ? `<div class="guide"><b>고객 안내</b> ${esc(f.guide)}</div>` : ""}
       ${f.flag ? `<div class="flag">확인 중 · ${esc(f.flag)}</div>` : ""}
-      ${f.url || f.id ? `<div class="foot">${f.id ? `<button type="button" class="del" data-id="${esc(f.id)}">삭제</button>` : ""}${/^https?:\/\//.test(f.url || "") ? `<a href="${esc(f.url)}" target="_blank" rel="noopener">제품 페이지 ↗</a>` : ""}</div>` : ""}
+      ${f.url || (f.id && adminKey) ? `<div class="foot">${f.id && adminKey ? `<button type="button" class="del" data-id="${esc(f.id)}">삭제</button>` : ""}${/^https?:\/\//.test(f.url || "") ? `<a href="${esc(f.url)}" target="_blank" rel="noopener">제품 페이지 ↗</a>` : ""}</div>` : ""}
     </article>`).join("") : `<div class="card empty">검색 결과가 없습니다. 처음 들어온 프레임이면 위 판정 기준으로 확인해 주세요.</div>`;
 }
 
@@ -554,9 +571,36 @@ $("list").addEventListener("click", async e => {
   try { await Store.remove(b.dataset.id); } catch (err) { b.textContent = "삭제 실패"; }
 });
 
-Store.init().then(() => {
+// 관리자(삭제 권한) — 비밀번호가 맞으면 이 브라우저에 기억해 둔다. 서버도 삭제 때마다 다시 확인한다.
+function setAdmin(key){
+  adminKey = key;
+  try { key ? localStorage.setItem("csNoticeAdminKey", key) : localStorage.removeItem("csNoticeAdminKey"); } catch (e) {}
+  $("adminOpen").hidden = !!key; $("adminForm").hidden = true; $("adminOn").hidden = !key;
+  render();
+}
+async function checkAdmin(key){
+  try { const r = await fetch("/api/admin/check", {method: "POST", headers: {"X-Admin-Key": key}}); return r.ok; }
+  catch (e) { return false; }
+}
+$("adminOpen").addEventListener("click", () => { $("adminForm").hidden = false; $("adminOpen").hidden = true; $("adminKey").focus(); });
+$("adminOff").addEventListener("click", () => setAdmin(""));
+$("adminForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const key = $("adminKey").value.trim(); if (!key) return;
+  const m = $("adminMsg"); m.textContent = "확인하는 중…"; m.className = "fmsg";
+  if (await checkAdmin(key)) { $("adminKey").value = ""; m.textContent = ""; setAdmin(key); }
+  else { m.textContent = "비밀번호가 맞지 않아요."; m.className = "fmsg err"; }
+});
+
+Store.init().then(async () => {
   if (!Store.mode) return;
   $("addToggle").hidden = false;
+  // 삭제 권한은 사내 서버 버전에만 있다
+  if (Store.mode === "api") {
+    $("adminBar").hidden = false;
+    let saved = ""; try { saved = localStorage.getItem("csNoticeAdminKey") || ""; } catch (e) {}
+    if (saved && await checkAdmin(saved)) setAdmin(saved); else if (saved) setAdmin("");
+  }
   Store.subscribe(rows => {
     ADDED = rows.filter(r => r && LABEL[r.v] && r.brand && r.reply)
                 .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
