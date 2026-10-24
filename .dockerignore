@@ -1,0 +1,19 @@
+Dockerfile
+.dockerignore
+.git
+.gitignore
+README.md
+.next
+node_modules
+npm-debug.log
+.env
+.env.local
+.env.*.local
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+coverage
+# .eslintrc.json 은 일부러 제외하지 않는다: next build 가 빌드 중 ESLint 를 돌리므로,
+# 이 설정을 컨테이너에 포함해야 로컬 빌드와 도커 빌드의 lint 동작이 같아진다.
+.prettierrc
