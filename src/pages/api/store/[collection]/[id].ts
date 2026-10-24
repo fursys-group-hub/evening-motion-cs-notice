@@ -19,6 +19,15 @@ function clean(body: unknown): Record<string, string> | null {
   }
   if (!out.brand || !out.name || !out.reply) return null;
   if (out.url && !/^https?:\/\//.test(out.url)) return null;
+  // 확정 사례(seed)를 고쳐 쓸 때 넘어오는 썸네일 이름·확인 메모
+  if (b.thumb != null) {
+    if (typeof b.thumb !== 'string' || !/^[a-z]{1,20}$/.test(b.thumb)) return null;
+    out.thumb = b.thumb;
+  }
+  if (b.flag != null) {
+    if (typeof b.flag !== 'string' || b.flag.length > 400) return null;
+    out.flag = b.flag;
+  }
   if (b.photo) {
     if (typeof b.photo !== 'string' || b.photo.length > PHOTO_MAX || !PHOTO_RE.test(b.photo)) return null;
     out.photo = b.photo;

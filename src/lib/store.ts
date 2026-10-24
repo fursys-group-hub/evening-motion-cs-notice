@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import seedFrames from './seed-frames.json';
 
 /**
  * 화면에서 추가한 회신을 담는 작은 저장소.
@@ -28,12 +29,31 @@ function fileOf(collection: string) {
   return path.join(DATA_DIR, `${collection}.json`);
 }
 
-async function readAll(collection: string): Promise<Record<string, Record<string, unknown>>> {
+async function readRaw(collection: string): Promise<Record<string, Record<string, unknown>>> {
   try {
     return JSON.parse(await fs.readFile(fileOf(collection), 'utf8'));
   } catch (e) {
     if ((e as NodeJS.ErrnoException).code === 'ENOENT') return {};
     throw e;
+  }
+}
+
+// 확정 사례 12건(CS 채널 9/3~9/28 회신)을 처음 한 번만 저장소에 넣는다.
+// 넣은 뒤에는 표식 파일이 남아, 화면에서 지운 사례가 다시 살아나지 않는다.
+const SEEDS: Record<string, Record<string, Record<string, unknown>>> = { frame_replies: seedFrames };
+
+async function readAll(collection: string): Promise<Record<string, Record<string, unknown>>> {
+  const seed = SEEDS[collection];
+  if (!seed) return readRaw(collection);
+  const marker = `${fileOf(collection)}.seeded`;
+  try {
+    await fs.access(marker);
+    return readRaw(collection);
+  } catch {
+    const all = { ...seed, ...(await readRaw(collection)) };
+    await writeAll(collection, all);
+    await fs.writeFile(marker, new Date().toISOString(), 'utf8');
+    return all;
   }
 }
 
@@ -49,7 +69,7 @@ export function validId(id: string) {
 }
 
 export async function listDocs(collection: string): Promise<Doc[]> {
-  const all = await readAll(collection);
+  const all = await serial(() => readAll(collection));
   return Object.keys(all)
     .sort()
     .map((id) => ({ id, data: all[id] }));

@@ -436,7 +436,8 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;
 // 페이지에서 추가한 회신. 아티팩트에서는 db 기능, 사내 서버에서는 /api/store 에 저장된다.
 const COLL = "frame_replies";
 let ADDED = [];
-const all = () => FRAMES.concat(ADDED);
+// 저장소가 연결되면 확정 사례 12건도 저장소에 들어 있으므로(서버가 처음 한 번 넣는다) 저장소 목록만 쓴다.
+const all = () => Store.mode ? ADDED : FRAMES;
 
 const Store = {
   mode: null, db: null,
@@ -494,7 +495,7 @@ function render(){
         <div class="head">${f.thumb ? `<img class="thumb" src="${thumbSrc(f.thumb)}" alt="${esc(f.brand)} ${esc(f.name)}" loading="lazy">` : /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(f.photo || "") ? `<img class="thumb" src="${f.photo}" alt="${esc(f.brand)} ${esc(f.name)}">` : ""}<div><div class="brand">${esc(f.brand)}</div><div class="name">${esc(f.name)}</div></div></div>
         <span class="badge">${LABEL[f.v]}</span>
       </div>
-      ${f.type || f.id ? `<div class="tags">${f.type ? `<span class="tag">${esc(f.type)}</span>` : ""}${f.id ? `<span class="added">추가한 회신</span>` : ""}</div>` : ""}
+      ${f.type || (f.id && !f.seed) ? `<div class="tags">${f.type ? `<span class="tag">${esc(f.type)}</span>` : ""}${f.id && !f.seed ? `<span class="added">추가한 회신</span>` : ""}</div>` : ""}
       <div class="reply">${esc(f.reply)}</div>
       ${f.guide ? `<div class="guide"><b>고객 안내</b> ${esc(f.guide)}</div>` : ""}
       ${f.flag ? `<div class="flag">확인 중 · ${esc(f.flag)}</div>` : ""}

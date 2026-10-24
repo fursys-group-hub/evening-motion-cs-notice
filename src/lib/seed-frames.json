@@ -1,0 +1,137 @@
+{
+  "s01": {
+    "v": "ok",
+    "brand": "일룸",
+    "name": "헤이즐R 침대 프레임 SS",
+    "type": "",
+    "reply": "호환 가능",
+    "url": "https://www.iloom.com/product/detail.do?productCd=IBL0014A",
+    "thumb": "heizel",
+    "seed": true,
+    "createdAt": "2026-09-18T00:00:00.000Z"
+  },
+  "s02": {
+    "v": "ok",
+    "brand": "일룸",
+    "name": "쿠시노 저상형 침대 프레임 SS (인조가죽)",
+    "type": "저상형",
+    "reply": "호환 가능",
+    "url": "https://www.iloom.com/product/detail.do?productCd=HB721103",
+    "thumb": "cushino",
+    "seed": true,
+    "createdAt": "2026-09-18T00:00:00.000Z"
+  },
+  "s03": {
+    "v": "ok",
+    "brand": "리바트",
+    "name": "토스트 네츄럴 슈퍼싱글 침대 프레임",
+    "type": "",
+    "reply": "호환 가능",
+    "url": "https://www.hyundailivart.co.kr/p/P100009520",
+    "thumb": "toast",
+    "flag": "고객이 적은 프레임 가로는 1,110mm로, 기준(1,120mm)보다 10mm 작은데 가능으로 회신됨. 내경인지 외경인지 확인 전입니다. CS 문의에는 '일룸'으로 적혔으나 현대리바트 제품입니다.",
+    "seed": true,
+    "createdAt": "2026-09-14T00:00:00.000Z"
+  },
+  "s04": {
+    "v": "ok",
+    "brand": "도모디자인",
+    "name": "듀엘라 슬라이딩 트윈 침대 프레임",
+    "type": "평판형",
+    "reply": "평판형 프레임이라 호환 가능",
+    "url": "https://www.domodesign.kr/shop/shopdetail.html?branduid=2255399",
+    "thumb": "duella",
+    "seed": true,
+    "createdAt": "2026-09-17T00:00:00.000Z"
+  },
+  "s05": {
+    "v": "ok",
+    "brand": "제퍼슨가구",
+    "name": "라이든 부부 트윈침대",
+    "type": "평상형",
+    "reply": "라이든 평상형 호환 가능",
+    "url": "https://smartstore.naver.com/jfsgagu/products/10902221048",
+    "thumb": "leiden",
+    "seed": true,
+    "createdAt": "2026-09-28T00:00:00.000Z"
+  },
+  "s06": {
+    "v": "ok",
+    "brand": "제퍼슨가구",
+    "name": "모르벤 부부 트윈침대",
+    "type": "평상형 · 수납형",
+    "reply": "모르벤 평상형·수납형 모두 호환 가능",
+    "url": "https://smartstore.naver.com/jfsgagu/products/13724897930",
+    "thumb": "morben",
+    "seed": true,
+    "createdAt": "2026-09-28T00:00:00.000Z"
+  },
+  "s07": {
+    "v": "cond",
+    "brand": "일룸",
+    "name": "멘디 침대 프레임 SS",
+    "type": "",
+    "reply": "호환은 가능하나 특이사항 안내",
+    "guide": "프레임 세로 내경이 2,000mm로 딱 맞아, 헤드 동작 시 헤드보드와 간섭이 있을 수 있음 — 구매 참고로 안내",
+    "url": "https://www.iloom.com/product/detail.do?productCd=IBL0026A",
+    "thumb": "mendy",
+    "seed": true,
+    "createdAt": "2026-09-18T00:00:00.000Z"
+  },
+  "s08": {
+    "v": "cond",
+    "brand": "일룸",
+    "name": "로이모노 슈퍼싱글 침대 프레임 1100폭",
+    "type": "",
+    "reply": "구조적 문제 없음. 다만 사각 코너의 매트리스 밀림방지 가드가 모션 작동 시 간섭될 수 있음",
+    "guide": "하단 코너 가드를 제거하고 동봉된 밀림방지패드를 깔고 사용 권장. 그냥 써서 이상 없으면 그대로 사용",
+    "url": "https://www.iloom.com/product/detail.do?productCd=HSSE170",
+    "thumb": "roimono",
+    "seed": true,
+    "createdAt": "2026-09-22T00:00:00.000Z"
+  },
+  "s09": {
+    "v": "cond",
+    "brand": "슬립퍼",
+    "name": "커브 침대 프레임",
+    "type": "",
+    "reply": "호환은 가능해 보이나 간섭 부분 확인 후 구매 필요",
+    "guide": "헤드·풋보드와 사이드 가드 코너에 R값(둥근 모서리)이 있음 → 둥근 부분을 뺀 내경이 가로 1,120mm·세로 2,020mm 이상인지 꼭 확인 후 구매",
+    "url": "https://sleeper.co.kr/product/%EC%BB%A4%EB%B8%8C-%EC%B9%A8%EB%8C%80-%ED%94%84%EB%A0%88%EC%9E%84/1681/",
+    "thumb": "curve",
+    "seed": true,
+    "createdAt": "2026-09-28T00:00:00.000Z"
+  },
+  "s10": {
+    "v": "cond",
+    "brand": "일반",
+    "name": "수납형 침대 프레임",
+    "type": "수납형",
+    "reply": "대부분의 수납형 프레임과 호환되도록 설계. 제조사마다 자재·구조·최대하중이 달라 사양 확인 필요",
+    "guide": "내경 가로·세로 각 20mm 이상 여유 (SS: 1,120 × 2,020mm 이상) + 최대 정하중 400kg 이상이면 무리 없이 호환",
+    "seed": true,
+    "createdAt": "2026-09-28T00:00:00.000Z"
+  },
+  "s11": {
+    "v": "warn",
+    "brand": "자다",
+    "name": "LED 아쿠아텍스 패브릭 호텔 평상형 침대 프레임",
+    "type": "평상형",
+    "reply": "R&D 검토 결과 제품 내부 구조를 정확히 파악하기 어려워 안전상 호환 권장 안 함",
+    "guide": "마룻바닥 사용은 무방 — 습기 관리, 주기적 환기 안내",
+    "url": "https://store.ohou.se/goods/825288",
+    "thumb": "jada",
+    "seed": true,
+    "createdAt": "2026-09-03T00:00:00.000Z"
+  },
+  "s12": {
+    "v": "no",
+    "brand": "공통",
+    "name": "매트리스에 침대 다리 부착",
+    "type": "프레임 아님",
+    "reply": "메커니즘 지지판과 매트리스가 일체형이라 다리 추가 불가",
+    "guide": "일반 바닥 사용 가능. 프레임과 쓰려면 슬로우베드 아몬드 / 아몬드 저상형 / 아콘 추천",
+    "seed": true,
+    "createdAt": "2026-09-14T00:00:00.000Z"
+  }
+}
