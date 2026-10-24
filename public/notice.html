@@ -32,6 +32,13 @@ a{color:var(--blue)}
 .wrap{max-width:1080px;margin:0 auto;padding:32px 16px 64px}
 header h1{font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
 .sub{font-size:16px;font-weight:600;color:var(--text2);margin:0 0 10px}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 16px}
+.quick a{display:flex;flex-direction:column;gap:2px;text-decoration:none;background:var(--blue-bg);border:1px solid var(--blue);border-radius:12px;padding:12px 16px;min-width:0}
+.quick b{font-size:16px;color:var(--blue)}
+.quick span{font-size:12px;color:var(--text2)}
+.quick a:hover{background:var(--card)}
+.quick a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media (max-width:600px){.quick{grid-template-columns:1fr}}
 header p{margin:0;color:var(--text2);font-size:14px}
 .meta{margin-top:10px;font-size:12px;color:var(--text3)}
 section{margin-top:28px}
@@ -158,6 +165,11 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
 <header>
   <h1>이브닝 모션 안내사항</h1>
   <div class="sub">프레임 호환 아카이브 / 유저가이드</div>
+  <nav class="quick" aria-label="자주 여는 자료">
+    <a href="https://www.sloubed.com/category/M_MATTRESS/SLNE0110N" target="_blank" rel="noopener"><b>상세페이지</b><span>슬로우베드 공식몰 · 폼 매트리스 ↗</span></a>
+    <a href="https://fursys.atlassian.net/wiki/pages/viewpageattachments.action?pageId=31953348&amp;preview=%2F31953348%2F3513778922%2F%EC%9D%B4%EB%B8%8C%EB%8B%9D+%EB%AA%A8%EC%85%98+%EC%A0%9C%ED%92%88%EA%B0%80%EC%9D%B4%EB%93%9C_0819+%EC%88%98%EC%A0%95.pdf" target="_blank" rel="noopener"><b>제품가이드</b><span>컨플루언스 PDF · 0819 수정 ↗</span></a>
+    <a href="#guide"><b>유저가이드</b><span>리모컨 · 페어링 · A/S (이 페이지 아래) ↓</span></a>
+  </nav>
   <p>CS 채널 회신을 모아 만든 표입니다. 같은 프레임 문의가 다시 오면 여기서 찾아 회신 문구를 그대로 쓰면 됩니다.</p>
   <div class="meta">기준일 2026-10-23 · 회신 기간 2026-09-03 ~ 09-28 · 원본: 구글시트 「이브닝모션 프레임호환 CS 문의 로그」, #매트리스사업부-온라인컨택센터 회신</div>
   <nav class="jump" aria-label="바로가기">
@@ -165,9 +177,7 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
     <a href="#remote">리모컨 사용법</a>
     <a href="#trouble">작동 안 될 때</a>
     <a href="#caution">모션 주의사항</a>
-    <a href="#as">정품인증 · A/S</a>
-    <a class="ext" href="https://fursys.atlassian.net/wiki/pages/viewpageattachments.action?pageId=31953348&amp;preview=%2F31953348%2F3513778922%2F%EC%9D%B4%EB%B8%8C%EB%8B%9D+%EB%AA%A8%EC%85%98+%EC%A0%9C%ED%92%88%EA%B0%80%EC%9D%B4%EB%93%9C_0819+%EC%88%98%EC%A0%95.pdf" target="_blank" rel="noopener">제품가이드 ↗</a>
-  </nav>
+    <a href="#as">정품인증 · A/S</a>  </nav>
 </header>
 
 <section id="frames">
