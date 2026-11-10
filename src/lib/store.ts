@@ -38,23 +38,37 @@ async function readRaw(collection: string): Promise<Record<string, Record<string
   }
 }
 
-// 확정 사례 12건(CS 채널 9/3~9/28 회신)을 처음 한 번만 저장소에 넣는다.
-// 넣은 뒤에는 표식 파일이 남아, 화면에서 지운 사례가 다시 살아나지 않는다.
+// 확정 사례(CS 채널 회신)를 저장소에 넣는다. 사례마다 딱 한 번만 넣고, 넣은 id 는 표식 파일
+// (<collection>.json.seeded-ids)에 남겨 화면에서 지운 사례가 다시 살아나지 않게 한다.
+// 예전 표식(.seeded, 첫 12건 s01~s12 를 넣었다는 뜻)만 있는 서버는 그 12건을 넣은 것으로 본다.
 const SEEDS: Record<string, Record<string, Record<string, unknown>>> = { frame_replies: seedFrames };
+const LEGACY_SEEDED = Array.from({ length: 12 }, (_, i) => `s${String(i + 1).padStart(2, '0')}`);
+
+async function seededIds(collection: string): Promise<Set<string> | null> {
+  try {
+    return new Set(JSON.parse(await fs.readFile(`${fileOf(collection)}.seeded-ids`, 'utf8')));
+  } catch {
+    try {
+      await fs.access(`${fileOf(collection)}.seeded`);
+      return new Set(LEGACY_SEEDED);
+    } catch {
+      return null;
+    }
+  }
+}
 
 async function readAll(collection: string): Promise<Record<string, Record<string, unknown>>> {
   const seed = SEEDS[collection];
-  if (!seed) return readRaw(collection);
-  const marker = `${fileOf(collection)}.seeded`;
-  try {
-    await fs.access(marker);
-    return readRaw(collection);
-  } catch {
-    const all = { ...seed, ...(await readRaw(collection)) };
-    await writeAll(collection, all);
-    await fs.writeFile(marker, new Date().toISOString(), 'utf8');
-    return all;
-  }
+  const all = await readRaw(collection);
+  if (!seed) return all;
+  const done = (await seededIds(collection)) ?? new Set<string>();
+  const fresh = Object.keys(seed).filter((id) => !done.has(id));
+  if (!fresh.length) return all;
+  for (const id of fresh) if (!(id in all)) all[id] = seed[id];
+  await writeAll(collection, all);
+  fresh.forEach((id) => done.add(id));
+  await fs.writeFile(`${fileOf(collection)}.seeded-ids`, JSON.stringify([...done]), 'utf8');
+  return all;
 }
 
 async function writeAll(collection: string, all: Record<string, Record<string, unknown>>) {
