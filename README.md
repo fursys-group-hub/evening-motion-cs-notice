@@ -12,7 +12,7 @@ npm run dev          # → http://localhost:3000
 
 > 만약 스캐폴드 시 `--no-install` 옵션을 사용하셨다면, `npm install` 을 먼저 실행해주세요.
 
-화면은 `public/notice.html` 한 장이에요(이브닝 모션 안내사항 — 프레임 호환 아카이브 + 유저가이드). 화면에서 "회신 추가"로 넣은 회신은 `/api/store/frame_replies` 가 `APP_DATA_DIR`(기본 /app/data, 영구볼륨)에 저장해요.
+화면은 `public/notice.html` 한 장이에요(이브닝 모션 호환 프레임 CS 가이드 — 판단 기준·간편 판정·회신 아카이브). 화면에서 "회신 추가"로 넣은 회신은 `/api/store/frame_replies` 가 `APP_DATA_DIR`(기본 /app/data, 영구볼륨)에 저장해요.
 
 서버 측 로직(DB 조회, 외부 API 호출, 시크릿 다루는 작업)은 `src/pages/api/*` 안에 넣어주세요. 같은 도메인으로 호출되기 때문에 CORS 가 발생하지 않고, 시크릿이 브라우저로 노출되지도 않아요.
 
@@ -40,15 +40,6 @@ src/
 ├── lib/utils.ts            # cn() 헬퍼
 └── styles/globals.css      # Tailwind
 ```
-
-### 타사 프레임 AI 1차 검증 (`/api/frame-check`)
-
-「호환 자체 판단 가이드」의 간편 판정 위에 있는 **AI 1차 검증**이 이 라우트를 부릅니다.
-
-- 링크를 넣으면 서버가 상세페이지와 상세 이미지를 받아(긴 이미지는 2000px 단위로 잘라) Claude(`claude-opus-5-5`)에게 읽히고, 프레임 테두리·안쪽/바깥 치수·헤드/풋보드·받침·정하중을 근거 문구와 함께 JSON 으로 돌려줍니다. 화면은 그 값으로 간편 판정 칸을 채우고, 판정은 화면의 규칙(+10mm 이상 가능)으로 계산합니다.
-- 네이버 스마트스토어처럼 서버 접속을 막는 곳(429)은 **캡처 업로드**로 같은 검증을 합니다.
-- 사내 도메인(fursys.com 등)·사설 IP 는 읽지 않습니다.
-- **필요한 환경변수**: `ANTHROPIC_API_KEY` — Coolify Environment Variables 에 Runtime, `Locked=Yes` 로 등록. 없으면 버튼을 눌렀을 때 "AI 키가 아직 등록되지 않았어요"가 뜹니다.
 
 ## 환경 변수
 
