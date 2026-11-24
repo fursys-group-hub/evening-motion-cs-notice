@@ -198,7 +198,11 @@ class HttpError extends Error {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST 만 지원해요.' });
+  // GET: 화면이 처음 열릴 때 AI 검증을 쓸 수 있는지만 묻는다(키 값은 절대 돌려주지 않는다)
+  if (req.method === 'GET') {
+    return res.status(200).json({ ready: process.env.NODE_ENV !== 'production' || !!process.env.ANTHROPIC_API_KEY });
+  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'GET·POST 만 지원해요.' });
   // 로컬 개발에서는 `ant auth login` 프로필로도 동작하게, 키 확인은 배포 환경에서만 한다
   if (process.env.NODE_ENV === 'production' && !process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: '서버에 AI 키(ANTHROPIC_API_KEY)가 아직 등록되지 않았어요.' });
 

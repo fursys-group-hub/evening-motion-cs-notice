@@ -63,11 +63,20 @@ async function readAll(collection: string): Promise<Record<string, Record<string
   if (!seed) return all;
   const done = (await seededIds(collection)) ?? new Set<string>();
   const fresh = Object.keys(seed).filter((id) => !done.has(id));
-  if (!fresh.length) return all;
+  // 이미 들어간 확정 사례의 문구를 고쳤을 때: seed 의 rev 가 더 크고, 서버 카드가 아직 손대지 않은
+  // 확정 사례(seed:true — 관리자가 고친 카드는 저장 때 seed 표시가 빠진다)일 때만 새 문구로 바꾼다.
+  const revised = Object.keys(seed).filter((id) => {
+    const cur = all[id];
+    return !!cur && cur.seed === true && Number(seed[id].rev || 0) > Number(cur.rev || 0);
+  });
+  if (!fresh.length && !revised.length) return all;
   for (const id of fresh) if (!(id in all)) all[id] = seed[id];
+  for (const id of revised) all[id] = seed[id];
   await writeAll(collection, all);
-  fresh.forEach((id) => done.add(id));
-  await fs.writeFile(`${fileOf(collection)}.seeded-ids`, JSON.stringify([...done]), 'utf8');
+  if (fresh.length) {
+    fresh.forEach((id) => done.add(id));
+    await fs.writeFile(`${fileOf(collection)}.seeded-ids`, JSON.stringify([...done]), 'utf8');
+  }
   return all;
 }
 
