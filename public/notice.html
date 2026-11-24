@@ -158,6 +158,16 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
 .pv.warn{background:var(--red-bg);color:var(--red)}
 .say{background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;white-space:pre-wrap}
 .result .primary{align-self:flex-start}
+.auto{display:flex;flex-direction:column;gap:8px;margin:4px 0 14px;padding:14px;border-radius:12px;background:var(--blue-bg)}
+.autorow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.autorow .search{max-width:none;flex:1 1 260px}
+.upl{flex:1 1 260px;font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.upl input{font-size:13px;max-width:100%}
+.ev{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px}
+.ev h4{margin:0 0 6px;font-size:14px}
+.ev ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.ev .src{color:var(--text3)}
+button:disabled{opacity:.55;cursor:progress}
 .steps4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .steps4 .no{width:26px;height:26px;border-radius:50%;background:var(--text);color:var(--card);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
 .steps4 p{margin:0;font-size:14px;color:var(--text2)}
@@ -266,7 +276,19 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
 
   <div class="card calc">
     <h3>간편 판정</h3>
-    <p class="formnote">제품 상세페이지나 제조사 답변에 적힌 값을 넣습니다. 모르는 칸은 "모름"으로 두면 무엇을 확인해야 하는지 알려 줍니다.</p>
+    <div class="auto">
+      <div class="autorow">
+        <input class="search" id="aUrl" type="url" placeholder="타사 상세페이지 링크 붙여넣기 (https://…)">
+        <button type="button" class="primary" id="aGo">AI 1차 검증</button>
+      </div>
+      <div class="autorow">
+        <label class="upl">링크가 안 열리면 상세페이지 캡처 올리기 <input id="aFiles" type="file" accept="image/*" multiple></label>
+        <button type="button" class="ghost" id="aUp">캡처로 검증</button>
+      </div>
+      <div id="aMsg" class="fmsg" role="status"></div>
+      <div id="aEv" class="ev" hidden></div>
+    </div>
+    <p class="formnote">AI 가 상세페이지에서 읽은 값을 아래 칸에 채웁니다. 근거 문구를 원본과 한 번 대조하고, 틀린 칸은 직접 고치세요. 직접 입력해도 됩니다. 모르는 칸은 "모름"으로 두면 무엇을 확인해야 하는지 알려 줍니다.</p>
     <div class="fgrid">
       <label>매트리스를 감싸는 테두리<select id="cRim">
         <option value="">선택</option><option value="yes">있음 (매립형·수납형 등)</option><option value="no">없음 (평판형·깔판만)</option>
@@ -849,6 +871,76 @@ Store.init().then(async () => {
     });
   }
   ids.forEach(function(id){ var el = $(id); el.addEventListener("input", run); el.addEventListener("change", run); });
+
+  /* AI 1차 검증 — /api/frame-check 결과로 위 칸을 채운다 */
+  var BASE = {board:"board", slat_ok:"slat", slat_wide:"wide", unknown:"unk"};
+  function fill(x){
+    $("cRim").value = x.rim === "yes" ? "yes" : x.rim === "no" ? "no" : "";
+    $("cW").value = x.inner_width_mm != null ? Math.round(x.inner_width_mm) : "";
+    $("cL").value = x.inner_length_mm != null ? Math.round(x.inner_length_mm) : "";
+    $("cLoad").value = x.max_load_kg == null ? "unk" : (x.max_load_kg >= 400 ? "ok" : "low");
+    $("cBase").value = BASE[x.base] || "unk";
+    $("cHead").checked = !!x.headboard; $("cFoot").checked = !!x.footboard;
+    $("cCorner").checked = !!x.corner_guard_or_round; $("cBox").checked = !!x.hotel_box; $("cLeg").checked = false;
+    run();
+  }
+  function mm(v){ return v == null ? "표기 없음" : Math.round(v).toLocaleString() + "mm"; }
+  function showEv(r){
+    var x = r.extract, s = r.source || {};
+    var basis = {explicit:"상세페이지에 안쪽 치수가 직접 적힘", mattress_size:"맞는 매트리스 크기로 적힘 → 안쪽은 그 크기에 꼭 맞는 것으로 봄", none:"안쪽 치수 표기 없음"}[x.inner_basis] || "";
+    var rows = [
+      "제품: " + (x.brand || "") + " " + (x.product_name || "") + (x.size_label ? " · " + x.size_label : ""),
+      "테두리: " + ({yes:"있음", no:"없음", unknown:"모름"}[x.rim]) + " · 안쪽 " + mm(x.inner_width_mm) + " × " + mm(x.inner_length_mm) + " (" + basis + ")",
+      "바깥: " + mm(x.outer_width_mm) + " × " + mm(x.outer_length_mm) + " · 최대 정하중: " + (x.max_load_kg == null ? "표기 없음" : x.max_load_kg + "kg") + (x.slat_gap_mm != null ? " · 갈빗살 간격 " + x.slat_gap_mm + "mm" : "")
+    ];
+    var h = '<h4>AI가 읽은 값</h4><ul>' + rows.map(function(t){ return "<li>" + esc(t) + "</li>"; }).join("") + '</ul>';
+    if (x.evidence && x.evidence.length) h += '<h4 style="margin-top:10px">근거</h4><ul>' + x.evidence.map(function(e){ return "<li><b>" + esc(e.field) + "</b> “" + esc(e.quote) + "” <span class=\"src\">(" + esc(e.source) + ")</span></li>"; }).join("") + '</ul>';
+    if (x.notes && x.notes.length) h += '<h4 style="margin-top:10px">참고</h4><ul>' + x.notes.map(function(t){ return "<li>" + esc(t) + "</li>"; }).join("") + '</ul>';
+    h += '<p class="note">' + (s.type === "url" ? "링크에서 이미지 " + (s.fetchedImages || 0) + "장(조각 " + (s.slices || 0) + "개)을 읽었습니다." : "올린 캡처 조각 " + (s.slices || 0) + "개를 읽었습니다.") + ' AI 1차 검증이라 틀릴 수 있습니다. 최종 판단은 위 4단계 기준으로 합니다.</p>';
+    $("aEv").innerHTML = h; $("aEv").hidden = false;
+  }
+  function call(payload, btn){
+    var msg = $("aMsg"), label = btn.textContent;
+    msg.className = "fmsg"; msg.textContent = "상세페이지를 읽는 중… (1~3분 걸릴 수 있어요)";
+    $("aGo").disabled = $("aUp").disabled = true; btn.textContent = "읽는 중…";
+    fetch("/api/frame-check", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(payload)})
+      .then(function(r){ return r.json().catch(function(){ return {error:"서버 응답을 읽지 못했어요 (" + r.status + ")"}; }); })
+      .then(function(r){
+        if (!r || !r.ok) throw new Error((r && r.error) || "검증에 실패했어요.");
+        if (!r.extract.page_ok) { msg.textContent = "침대 프레임 정보를 찾지 못했어요. 상세페이지 캡처를 올려 주세요."; msg.className = "fmsg err"; showEv(r); return; }
+        fill(r.extract); showEv(r); msg.textContent = "아래 칸을 채웠어요. 근거를 확인하세요.";
+      })
+      .catch(function(e){ msg.className = "fmsg err"; msg.textContent = e.message; })
+      .then(function(){ $("aGo").disabled = $("aUp").disabled = false; btn.textContent = label; });
+  }
+  $("aGo").addEventListener("click", function(){
+    var u = $("aUrl").value.trim();
+    if (!/^https?:\/\//i.test(u)) { $("aMsg").className = "fmsg err"; $("aMsg").textContent = "https:// 로 시작하는 링크를 넣어 주세요."; return; }
+    call({url: u}, this);
+  });
+  function shrink(file){ // 업로드 전에 가로 1400px 로 줄여 용량을 낮춘다
+    return new Promise(function(ok, no){
+      var fr = new FileReader();
+      fr.onerror = no;
+      fr.onload = function(){
+        var img = new Image();
+        img.onerror = no;
+        img.onload = function(){
+          var s = Math.min(1, 1400 / img.width), c = document.createElement("canvas");
+          c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          ok(c.toDataURL("image/jpeg", 0.85));
+        };
+        img.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  $("aUp").addEventListener("click", function(){
+    var files = Array.prototype.slice.call($("aFiles").files || [], 0, 20), btn = this;
+    if (!files.length) { $("aMsg").className = "fmsg err"; $("aMsg").textContent = "캡처 이미지를 먼저 골라 주세요."; return; }
+    Promise.all(files.map(shrink)).then(function(list){ call({images: list}, btn); }, function(){ $("aMsg").className = "fmsg err"; $("aMsg").textContent = "이미지를 읽지 못했어요."; });
+  });
 })();
 </script>
 </body>
