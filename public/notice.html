@@ -142,16 +142,38 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
 .adminlink:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .adminform{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .adminform input{font:inherit;font-size:14px;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px;min-width:0}
+/* 자체 판단 가이드 */
+.lead{margin:0 0 12px;font-size:14px;color:var(--text2)}
+.calc{margin-bottom:12px}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px;font-weight:500;color:var(--text);font-size:14px;padding-top:4px}
+.checks span{display:inline-flex;gap:5px;align-items:center}
+.result{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.result .empty{padding:0;text-align:left;font-size:14px}
+.rv{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:18px;font-weight:800}
+.pv{display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.rv .pv{font-size:14px;padding:3px 10px}
+.pv.ok,.pv.cond{background:var(--blue-bg);color:var(--blue)}
+.pv.ask,.pv.hold{background:var(--amber-bg);color:var(--amber)}
+.pv.no{background:var(--gray-bg);color:var(--gray)}
+.pv.warn{background:var(--red-bg);color:var(--red)}
+.say{background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;white-space:pre-wrap}
+.result .primary{align-self:flex-start}
+.steps4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.steps4 .no{width:26px;height:26px;border-radius:50%;background:var(--text);color:var(--card);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.steps4 p{margin:0;font-size:14px;color:var(--text2)}
+.steps4 p b{color:var(--text)}
+.spec.mini{margin-top:8px;font-size:13px}
+.spec.mini td{padding:6px 4px}
 .remote-row{display:grid;grid-template-columns:280px 1fr;gap:12px;align-items:start}
 .remote{margin:0;background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;justify-content:center}
 .remote img{width:100%;max-width:256px;height:auto;display:block}
 @media (max-width:820px){
-  .rules{grid-template-columns:repeat(2,1fr)}
+  .rules,.steps4{grid-template-columns:repeat(2,1fr)}
   .grid,.patterns,.cols,.remote-row{grid-template-columns:1fr}
   .fgrid{grid-template-columns:1fr 1fr}
 }
 @media (max-width:420px){
-  .rules{grid-template-columns:1fr}
+  .rules,.steps4{grid-template-columns:1fr}
   .fgrid{grid-template-columns:1fr}
   .fgrid .wide{grid-column:auto}
   header h1{font-size:22px}
@@ -176,7 +198,8 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
   html,body{background:#fff}
   body{font-size:13px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}
   .wrap{max-width:none;padding:0}
-  .pdfbtn,.jump,.toolbar,.addform,.adminbar,.del,.quick a[href="#guide"]{display:none !important}
+  .pdfbtn,.jump,.toolbar,.addform,.adminbar,.del,.calc,.quick a[href="#guide"]{display:none !important}
+  .steps4{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .printdate{display:inline}
   header h1{font-size:24px}
   .quick{grid-template-columns:1fr 1fr;margin:10px 0 12px}
@@ -230,19 +253,104 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
   <p>CS 채널 회신을 모아 만든 표입니다. 같은 프레임 문의가 다시 오면 여기서 찾아 회신 문구를 그대로 쓰면 됩니다.</p>
   <div class="meta">기준일 2026-11-24 · 회신 기간 2026-09-03 ~ 11-24 · 원본: 구글시트 「이브닝모션 프레임호환 CS 문의 로그」, #매트리스사업부-온라인컨택센터 회신<span class="printdate" id="printDate"></span></div>
   <nav class="jump" aria-label="바로가기">
+    <a href="#selfcheck">호환 자체 판단</a>
     <a href="#frames">프레임 호환</a>
     <a href="#trouble">작동 안 될 때</a>
     <a href="#caution">모션 주의사항</a>
     <a href="#as">정품인증 · A/S</a>  </nav>
 </header>
 
+<section id="selfcheck">
+  <h2>호환 자체 판단 가이드 — 고객센터용</h2>
+  <p class="lead">타사 프레임 문의가 오면 아래 순서대로 보고 바로 회신합니다. 사업팀에 넘기는 경우는 맨 아래 「이럴 때만 사업팀에 물어보기」에 해당할 때뿐입니다.</p>
+
+  <div class="card calc">
+    <h3>간편 판정</h3>
+    <p class="formnote">제품 상세페이지나 제조사 답변에 적힌 값을 넣습니다. 모르는 칸은 "모름"으로 두면 무엇을 확인해야 하는지 알려 줍니다.</p>
+    <div class="fgrid">
+      <label>매트리스를 감싸는 테두리<select id="cRim">
+        <option value="">선택</option><option value="yes">있음 (매립형·수납형 등)</option><option value="no">없음 (평판형·깔판만)</option>
+      </select></label>
+      <label>안쪽 가로 (mm)<input id="cW" type="number" inputmode="numeric" min="0" max="3000" placeholder="예: 1120"></label>
+      <label>안쪽 세로 (mm)<input id="cL" type="number" inputmode="numeric" min="0" max="3000" placeholder="예: 2020"></label>
+      <label>최대 정하중<select id="cLoad">
+        <option value="unk">모름 · 표기 없음</option><option value="ok">400kg 이상</option><option value="low">400kg 미만</option>
+      </select></label>
+      <label>받침<select id="cBase">
+        <option value="unk">모름</option><option value="board">통판 · 분할 깔판</option><option value="slat">갈빗살 간격 50mm 이하</option><option value="wide">갈빗살 간격 50mm 초과</option>
+      </select></label>
+      <label class="wide">해당하는 것 모두 체크<span class="checks">
+        <span><input type="checkbox" id="cHead"> 헤드보드</span>
+        <span><input type="checkbox" id="cFoot"> 풋보드</span>
+        <span><input type="checkbox" id="cCorner"> 코너 가드 · 둥근 모서리</span>
+        <span><input type="checkbox" id="cBox"> 호텔식 박스 · 내부 구조가 안 보임</span>
+        <span><input type="checkbox" id="cLeg"> 매트리스에 다리 달기</span>
+      </span></label>
+    </div>
+    <div class="result" id="cOut" aria-live="polite"><span class="empty">테두리 여부부터 고르면 결과가 나옵니다.</span></div>
+  </div>
+
+  <div class="steps4">
+    <div class="card">
+      <div class="no">1</div>
+      <h3>테두리가 있나</h3>
+      <p><b>없으면</b>(평판형·깔판만 있는 평상형) 사이즈는 거의 맞습니다. 2·3단계는 건너뛰고 4단계만 봅니다.<br><b>있으면</b> 2단계로.</p>
+    </div>
+    <div class="card">
+      <div class="no">2</div>
+      <h3>안쪽 치수를 받는다</h3>
+      <p>바깥 치수만 있으면 판정하지 않습니다. 테두리 두께만큼 안이 좁아집니다. 상세페이지에 없으면 고객이 판매처에 안쪽 가로×세로를 물어 받게 합니다. 둥근 모서리는 <b>둥근 부분을 뺀</b> 치수입니다.</p>
+    </div>
+    <div class="card">
+      <div class="no">3</div>
+      <h3>여유를 계산한다</h3>
+      <p>이브닝 모션 SS는 1,100 × 2,000mm. 안쪽 치수에서 빼서 <b>가로·세로 중 작은 쪽</b>으로 봅니다.</p>
+      <table class="spec mini">
+        <tbody>
+          <tr><td>10mm 이상</td><td><span class="pv ok">가능</span></td></tr>
+          <tr><td>0 ~ 9mm (딱 맞음)</td><td><span class="pv cond">조건부</span> 작동·하강 때 테두리에 닿을 수 있음</td></tr>
+          <tr><td>마이너스</td><td><span class="pv no">불가</span> 들어가지 않음</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="no">4</div>
+      <h3>받침·하중을 본다</h3>
+      <p>갈빗살 간격 50mm 초과면 <b>불가</b>. 통판·분할 깔판은 문제없습니다. 최대 정하중은 400kg 이상이어야 하고, 표기가 없으면 제조사에 확인하라고 안내합니다(이브닝 모션 폼 완제품 54kg).</p>
+    </div>
+  </div>
+
+  <div class="cols" style="margin-top:12px">
+    <div class="card">
+      <h3>바로 안 되는 경우 (사업팀 확인 없이 회신)</h3>
+      <ul class="bul">
+        <li>안쪽 치수가 1,100 × 2,000mm보다 작다 (바깥이 1,120mm 안팎인 매립형은 테두리를 빼면 여기에 걸리기 쉬우니 안쪽 치수를 꼭 받기)</li>
+        <li>갈빗살 간격이 50mm를 넘는다</li>
+        <li>매트리스에 다리를 달고 싶다 — 메커니즘 지지판과 매트리스가 일체형. 바닥 사용, 또는 아몬드·아몬드 저상형·아콘 프레임 추천</li>
+        <li>미드나잇 하프문은 마론·시나몬·버치만 (아콘 불가). 오리지널 모션 매트리스는 현재 프레임과 호환 불가</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>이럴 때만 사업팀에 물어보기</h3>
+      <ul class="bul">
+        <li>호텔식 박스형처럼 매트리스 아래 구조가 안 보이는 프레임 — 같은 호텔 평상형이라도 라클라우드 헤라스는 가능, 자다는 권장 안 함이었습니다</li>
+        <li>제조사도 안쪽 치수나 정하중을 알려 주지 않는다</li>
+        <li>최대 정하중이 400kg 미만이다</li>
+        <li>전동·접이식·이층 등 위 4단계로 판단이 안 되는 구조</li>
+      </ul>
+      <p class="note">판정 후에는 「타사 프레임 회신 사례」의 <b>+ 회신 추가</b>로 남겨 주세요. 다음 문의 때 같은 제품을 바로 찾을 수 있습니다.</p>
+    </div>
+  </div>
+  <p class="own-note">기준 출처: 수면제품개발팀 하정한 2026-11-24 — "외곽틀이 있는 건 내측 치수 기준 +10 이상이면 OK, 정치수일 경우 작동·하강 시 간섭이 있을 수 있다." 9/28 회신의 +20mm는 넉넉하게 쓰는 권장 여유이고, 판정선은 +10mm입니다.</p>
+</section>
+
 <section id="frames">
   <h2>판정 기준</h2>
   <div class="rules">
     <div class="card rule">
-      <div class="k">프레임 내경 (SS 기준)</div>
-      <div class="v">1,120 × 2,020mm 이상</div>
-      <div class="d">가로·세로 각각 매트리스보다 20mm 이상 여유</div>
+      <div class="k">테두리 있는 프레임 안쪽 (SS 기준)</div>
+      <div class="v">1,110 × 2,010mm 이상</div>
+      <div class="d">매트리스보다 10mm 이상 여유면 가능(20mm면 넉넉). 딱 맞으면 조건부, 테두리 없는 프레임은 사이즈 무관</div>
     </div>
     <div class="card rule">
       <div class="k">프레임 최대 정하중</div>
@@ -252,7 +360,7 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
     <div class="card rule no">
       <div class="k">갈빗살(슬랫) 간격</div>
       <div class="v">50mm 초과 불가</div>
-      <div class="d">외곽틀이 딱 맞는 프레임(여유 20mm 미만)도 불가</div>
+      <div class="d">통판·분할 깔판은 문제없음</div>
     </div>
     <div class="card rule no">
       <div class="k">다리 부착</div>
@@ -346,7 +454,7 @@ h2{font-size:17px;margin:0 0 12px;letter-spacing:-.01em}
   <div class="card">
     <ul class="other">
       <li><b>미드나잇 하프문</b>마론 · 시나몬 · 버치 프레임만 호환. 아콘은 불가</li>
-      <li><b>프레임 안쪽 여유 10mm</b>모션베드가 프레임에 닿지 않으려면 안쪽이 최소 10mm는 남아야 합니다. 이건 정말 최대한으로 줄였을 때의 한계치이고, 판정 기준은 위의 20mm 이상 그대로입니다.</li>
+      <li><b>프레임 안쪽 여유 10mm</b>모션베드가 테두리에 닿지 않으려면 안쪽이 최소 10mm는 남아야 합니다. 11/24 수면제품개발팀 기준으로 +10mm 이상이면 가능, 20mm면 넉넉합니다.</li>
       <li><b>이브닝 매트리스 + 아몬드 세트 (2개 붙여 쓰기)</b>프레임 사이를 3mm 띄워 설치해도 매트리스까지 띄울 필요는 없고, 가운데 쪽으로 붙여 씁니다. 다만 이브닝 매트리스는 옆면이 둥글고 손잡이가 달려 있어 붙여도 완전히 틈 없이 붙지는 않고 약간의 틈이 생길 수 있다고 안내합니다.</li>
       <li><b>오리지널 모션베드</b>기존 세트 프레임은 단종·잔여재고 없음. 기존 모션 매트리스와 현재 프레임은 호환 불가이고, 현재 모션 호환 프레임은 기존보다 헤드보드·총높이가 낮음</li>
     </ul>
@@ -672,6 +780,76 @@ Store.init().then(async () => {
     renderTally(); render();
   });
 });
+</script>
+<script>
+/* 호환 간편 판정 — 기준: 수면제품개발팀 11/24 (+10mm 이상 가능, 0~9mm 조건부) */
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var ids = ["cRim","cW","cL","cLoad","cBase","cHead","cFoot","cCorner","cBox","cLeg"];
+  var RANK = {ok:0, cond:1, hold:2, ask:3, no:4};
+  var LABEL = {ok:"가능", cond:"조건부", hold:"정보 받은 뒤 판정", ask:"사업팀 확인", no:"불가"};
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+  function run(){
+    var rim = $("cRim").value, W = parseInt($("cW").value,10), L = parseInt($("cL").value,10);
+    var load = $("cLoad").value, base = $("cBase").value;
+    var head = $("cHead").checked, foot = $("cFoot").checked, corner = $("cCorner").checked, box = $("cBox").checked, leg = $("cLeg").checked;
+    var out = $("cOut");
+    if (!rim && !leg) { out.innerHTML = '<span class="empty">테두리 여부부터 고르면 결과가 나옵니다.</span>'; return; }
+    var v = "ok", why = [], say = [];
+    function up(x){ if (RANK[x] > RANK[v]) v = x; }
+
+    if (leg) {
+      up("no"); why.push("다리 부착 불가 — 메커니즘 지지판과 매트리스가 일체형");
+      say.push("이브닝 모션은 메커니즘 지지판과 매트리스가 일체형이라 다리를 달 수 없습니다. 바닥에 그대로 쓰셔도 되고, 프레임이 필요하시면 슬로우베드 아몬드·아몬드 저상형·아콘 프레임을 추천드립니다.");
+    }
+    if (rim === "yes") {
+      if (isNaN(W) || isNaN(L)) {
+        up("hold"); why.push("테두리가 있는데 안쪽 치수가 없음 — 바깥 치수로는 판정하지 않음");
+        say.push("프레임 안쪽 치수(가로×세로)를 판매처에 확인해 알려 주시면 바로 확인해 드리겠습니다." + (corner ? " 모서리가 둥근 경우 둥근 부분을 뺀 치수로 알려 주세요." : ""));
+      } else {
+        var mw = W - 1100, ml = L - 2000, m = Math.min(mw, ml);
+        var txt = "여유 가로 " + mw + "mm · 세로 " + ml + "mm";
+        if (m < 0) {
+          up("no"); why.push(txt + " — 매트리스(1,100×2,000mm)보다 작아 들어가지 않음");
+          say.push("프레임 안쪽이 이브닝 모션(1,100×2,000mm)보다 작아 들어가지 않습니다.");
+        } else if (m < 10) {
+          up("cond"); why.push(txt + " — 딱 맞음. 작동·하강 때 테두리에 닿을 수 있음");
+          var parts = (head && foot) ? "머리 쪽과 다리 쪽이 헤드보드·풋보드에" : head ? "머리 쪽이 헤드보드에" : foot ? "다리 쪽이 풋보드에" : "옆면이 테두리에";
+          say.push("모션베드를 놓고 쓰시는 것 자체는 문제없습니다. 다만 프레임 안쪽이 모션베드 크기(1,100×2,000mm)와 거의 꼭 맞아, 작동하거나 내려갈 때 " + parts + " 살짝 닿을 수 있습니다. 닿지 않으려면 안쪽이 모션베드보다 10mm 이상 커야 하니 참고하셔서 선택해 주세요.");
+        } else {
+          why.push(txt + " — 10mm 이상 여유로 사이즈 호환" + (m < 20 ? " (20mm 미만이라 넉넉하진 않음)" : ""));
+          say.push("프레임 안쪽 치수가 충분해 사이즈상 호환됩니다.");
+        }
+        if (corner) why.push("코너 가드·둥근 모서리: 입력한 치수가 둥근 부분을 뺀 값인지 확인. 밀림방지 가드는 하단 가드를 떼고 시공 때 깔아드리는 밀림방지 패드 사용");
+      }
+    } else if (rim === "no") {
+      why.push("테두리 없음 — 사이즈는 문제없음");
+      say.push("매트리스를 감싸는 테두리가 없는 구조라 사이즈상 호환됩니다.");
+      if (head) { why.push("헤드보드에 매트리스가 붙어 놓이면 등판이 올라갈 때 닿을 수 있음"); say.push("등판이 올라갈 때 헤드보드에 닿지 않도록 헤드보드에서 조금 띄워 설치해 주세요."); }
+    }
+    if (rim) {
+      if (base === "wide") { up("no"); why.push("갈빗살 간격 50mm 초과 — 불가"); say.push("받침 갈빗살 간격이 50mm를 넘으면 모션베드를 받칠 수 없어 사용이 어렵습니다."); }
+      else if (base === "unk") { up("hold"); why.push("받침 구조 모름 — 통판인지, 갈빗살이면 간격이 50mm 이하인지 확인"); say.push("받침이 통판인지, 갈빗살이라면 간격이 50mm 이하인지 확인 부탁드립니다."); }
+      if (load === "unk") { up("cond"); why.push("정하중 모름 — 제조사 확인 조건"); say.push("프레임 최대 정하중이 400kg 이상인지는 제조사에 확인해 주세요."); }
+      else if (load === "low") { up("ask"); why.push("정하중 400kg 미만 — 사업팀 확인"); }
+      if (box) { up("ask"); why.push("호텔식 박스 등 내부 구조가 안 보임 — 같은 형태라도 제품마다 판정이 달랐음(헤라스 가능 / 자다 권장 안 함)"); }
+    }
+    if (v === "ask") say = ["확인 후 다시 안내드리겠습니다."];
+    else if (v !== "no" && rim) say.push("밀림방지 패드는 시공 때 깔아드립니다.");
+    var tail = v === "ask" ? '<p class="note">이 결과는 사업팀(슬랙 #매트리스사업부-온라인컨택센터)에 제품 링크와 함께 올려 주세요.</p>' : "";
+    out.innerHTML =
+      '<div class="rv"><span class="pv ' + v + '">' + LABEL[v] + '</span></div>' +
+      '<ul class="bul">' + why.map(function(w){ return "<li>" + esc(w) + "</li>"; }).join("") + '</ul>' +
+      '<div class="say" id="cSay">' + esc(say.join(" ")) + '</div>' +
+      '<button type="button" class="primary" id="cCopy">고객 안내 문구 복사</button>' + tail;
+    $("cCopy").addEventListener("click", function(){
+      var b = this, t = $("cSay").innerText;
+      function sel(){ var r = document.createRange(); r.selectNodeContents($("cSay")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "선택됨 · Ctrl+C로 복사"; }
+      try { navigator.clipboard.writeText(t).then(function(){ b.textContent = "복사됨"; }, sel); } catch(e){ sel(); }
+    });
+  }
+  ids.forEach(function(id){ var el = $(id); el.addEventListener("input", run); el.addEventListener("change", run); });
+})();
 </script>
 </body>
 </html>
